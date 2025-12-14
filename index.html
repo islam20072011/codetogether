@@ -461,24 +461,23 @@ console.log(hello("CodeTogether"));</code></pre>
     );
   };
 
-  document.getElementById('joinRoomBtn').onclick = () => {
-    openModal(
-      'Подключение к комнате',
-      'Введите код комнаты',
-      'Код комнаты',
-      (value) => alert('Подключение к комнате: ' + value + ' (демо)')
-    );
-  };
+document.getElementById('createRoomBtn').onclick = () => {
+  const roomId = Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
 
-  document.getElementById('registerBtn').onclick = () => {
-    openModal(
-      'Регистрация',
-      'Введите ваш email',
-      'email@example.com',
-      (value) => alert('Регистрация: ' + value + ' (демо)')
-    );
-  };
+  window.location.href = `room.html?room=${roomId}`;
+};
+
+document.getElementById('joinRoomBtn').onclick = () => {
+  const roomId = prompt('Введите код комнаты');
+  if (roomId) {
+    window.location.href = `room.html?room=${roomId}`;
+  }
+};
 </script>s
 
 </body>
 </html>
+
