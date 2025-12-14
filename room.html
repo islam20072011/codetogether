@@ -36,7 +36,7 @@
 
     textarea {
       width: 100%;
-      height: 60vh;
+      height: 50vh;
       background: #020617;
       color: #e5e7eb;
       border: none;
@@ -57,8 +57,29 @@
       background: #38bdf8;
       color: #020617;
     }
+
+    .chat {
+      margin-top: 30px;
+    }
+
+    .chat-box {
+      background: #020617;
+      border-radius: 12px;
+      padding: 15px;
+      height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+
+    .chat input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -70,9 +91,18 @@
   <div class="room-id" id="roomId"></div>
 
   <textarea id="editor">// Пишите код здесь...</textarea>
-
   <br>
   <button onclick="saveCode()">Сохранить код</button>
+
+  <!-- ЧАТ -->
+  <div class="chat">
+    <h3>💬 Чат комнаты</h3>
+
+    <div id="chat" class="chat-box"></div>
+
+    <input id="chatInput" placeholder="Введите сообщение..." />
+    <button onclick="sendMessage()">Отправить</button>
+  </div>
 </main>
 
 <script>
@@ -81,6 +111,8 @@
 
   const roomIdEl = document.getElementById('roomId');
   const editor = document.getElementById('editor');
+  const chatEl = document.getElementById('chat');
+  const chatInput = document.getElementById('chatInput');
 
   if (!room) {
     alert('Комната не указана');
@@ -90,14 +122,47 @@
   roomIdEl.textContent = 'Комната: ' + room;
 
   const storageKey = 'room_' + room;
+  const chatKey = 'chat_' + room;
 
   editor.value = localStorage.getItem(storageKey) || '';
 
   function saveCode() {
     localStorage.setItem(storageKey, editor.value);
-    alert('Код сохранён (локально)');
   }
+
+  const messages = JSON.parse(localStorage.getItem(chatKey) || '[]');
+  messages.forEach(addMessage);
+
+  function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    const message = {
+      text,
+      time: new Date().toLocaleTimeString()
+    };
+
+    messages.push(message);
+    localStorage.setItem(chatKey, JSON.stringify(messages));
+    addMessage(message);
+    chatInput.value = '';
+  }
+
+  function addMessage(message) {
+    const div = document.createElement('div');
+    div.innerHTML = `<small>[${message.time}]</small> ${message.text}`;
+    chatEl.appendChild(div);
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === chatKey) {
+      chatEl.innerHTML = '';
+      const updated = JSON.parse(e.newValue || '[]');
+      updated.forEach(addMessage);
+    }
+  });
 </script>
-  
+
 </body>
 </html>
